@@ -15,22 +15,24 @@ public class Player : MonoBehaviour
     private float jumpSkip = 0.1f;
     private float eps = 0.01f;
     private Animator animator;
-    private enum PossibleMoves {
+    public enum PossibleMoves {
         Left,
         Right,
         Jump, 
         Idle
     }
+    public static List<PossibleMoves> possibleMoves;
     // Start is called before the first frame update
     void Start()
     {   
         animator = gameObject.GetComponent<Animator>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        generatePossibleMoves();
+        possibleMoves = generatePossibleMoves();
         
         if (jumping && (timeSinceJump<jumpSkip)) {
             timeSinceJump += Time.deltaTime;

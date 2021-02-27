@@ -6,7 +6,7 @@ public class Obstacle : MonoBehaviour
 {
     public GameObject obstacle;
     private float timePassed = 0;
-    public float spawnFrequency = 3;
+    public static float spawnFrequency = 5;
     public static List<GameObject> obstacles = new List<GameObject>();
     // Start is called before the first frame update
     void Start()
