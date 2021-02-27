@@ -46,10 +46,10 @@ public class Player : MonoBehaviour
             // Debug.Log(gonnaColide());
             if (Input.GetKeyDown(KeyCode.RightArrow))
             { 
-                if (gonnaColide()) {
+                // if (gonnaColide()) {
                     moving = true;
                     end = new Vector3(bestRight(),transform.position.y,transform.position.z);
-                }
+                // }
                 // if ((transform.position.x + 2.5f < 5.0f)&& (Mathf.Abs(transform.position.y + 1.5f))<eps) {
                 //     moving = true;
                 //     end = transform.position + new Vector3(2.5f,0,0);
@@ -59,10 +59,10 @@ public class Player : MonoBehaviour
             // Left Event
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                if (gonnaColide()) {
+                // if (gonnaColide()) {
                     moving = true;
                     end = new Vector3(bestLeft(),transform.position.y,transform.position.z);
-                }
+                // }
 
                 // if ((transform.position.x - 2.5f > -5.0f)&& (Mathf.Abs(transform.position.y + 1.5f))<eps) {
                 //     moving = true;
@@ -113,9 +113,11 @@ public class Player : MonoBehaviour
         float leftX = obstacleCenterX - xScale/2;
         float width = bc.size.x;
         float perfectSpot = leftX - 0.2f - width/2;
+        if (perfectSpot > transform.position.x){
+            return transform.position.x;
 
-        if (perfectSpot>(-6+width/2)) {
-            return perfectSpot;
+        } else if (perfectSpot>(-6+width/2)) {
+            return (-6 + leftX)/2;
         } else {
             return -6+width/2;
         }
@@ -129,8 +131,11 @@ public class Player : MonoBehaviour
         float width = bc.size.x;
         float perfectSpot = rightX + 0.2f + width/2;
 
-        if (perfectSpot<(6-width/2)) {
-            return perfectSpot;
+
+        if (perfectSpot < transform.position.x){
+            return transform.position.x;
+        } else if (perfectSpot<(6-width/2)) {
+            return (6+rightX)/2;
         } else {
             return 6-width/2;
         }
@@ -164,29 +169,31 @@ public class Player : MonoBehaviour
         float width = bc.size.x;
         
 
-        if (gonnaColide()){
-            if (yScale <= 2){
-                possibleMoves.Add(PossibleMoves.Jump);
-            }
-            float perfectSpot = leftX - 0.2f - width/2;
+        
+        if (yScale <= 2){
+            possibleMoves.Add(PossibleMoves.Jump);
+        }
+        float perfectSpot = leftX - 0.2f - width/2;
 
-            if (perfectSpot>(-6+width/2)) {
-                possibleMoves.Add(PossibleMoves.Left);
-            }
+        if (perfectSpot>(-6+width/2)) {
+            possibleMoves.Add(PossibleMoves.Left);
+        }
 
-            perfectSpot = rightX + 0.2f + width/2;
+        perfectSpot = rightX + 0.2f + width/2;
 
-            if (perfectSpot<(6-width/2)) {
-                possibleMoves.Add(PossibleMoves.Right);
-            }
-        } else {
+        if (perfectSpot<(6-width/2)) {
+            possibleMoves.Add(PossibleMoves.Right);
+        }
+
+        if (!gonnaColide()) {
             possibleMoves.Add(PossibleMoves.Idle);
         }
+       
         string possible = "[";
         foreach( var x in possibleMoves) {
             possible = possible + x.ToString() + ", ";
         }
-        Debug.Log(possible+"]");
+        
         return possibleMoves;
 
     }
