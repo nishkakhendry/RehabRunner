@@ -1,0 +1,1 @@
+python3 run_pose.py --input sample3.jpeg --proto pose/coco/deploy_coco.prototxt --model pose/coco/pose_iter_440000.caffemodel --dataset COCO

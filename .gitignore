@@ -1,3 +1,7 @@
 Library
 Temp
 .vscode
+env
+*log
+*caffemodel
+result*
