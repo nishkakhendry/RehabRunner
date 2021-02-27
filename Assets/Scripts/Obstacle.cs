@@ -41,7 +41,7 @@ public class Obstacle : MonoBehaviour
             }
             else if (rng < 0.6)
             {
-                height = 1.5f;
+                height = 1.3f;
             }
             else
             {

@@ -7,7 +7,8 @@ public class Player : MonoBehaviour
 {
 
     private Vector3 end;
-    public Rigidbody rb; 
+    public Rigidbody rb;
+    public BoxCollider bc;
     private bool moving = false;
     private float eps = 0.01f;
     // Start is called before the first frame update
@@ -22,7 +23,7 @@ public class Player : MonoBehaviour
         // Right Event
         if (Input.GetKeyDown(KeyCode.RightArrow))
         { 
-            if ((transform.position.x + 2.5f < 5.0f)&& (Mathf.Abs(transform.position.y + 1))<eps) {
+            if ((transform.position.x + 2.5f < 5.0f)&& (Mathf.Abs(transform.position.y + 1.5f))<eps) {
                 moving = true;
                 end = transform.position + new Vector3(2.5f,0,0);
             }
@@ -31,7 +32,7 @@ public class Player : MonoBehaviour
         // Left Event
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         { 
-            if ((transform.position.x - 2.5f > -5.0f)&& (Mathf.Abs(transform.position.y + 1))<eps) {
+            if ((transform.position.x - 2.5f > -5.0f)&& (Mathf.Abs(transform.position.y + 1.5f))<eps) {
                 moving = true;
                 end = transform.position + new Vector3(-2.5f,0,0);
             }
