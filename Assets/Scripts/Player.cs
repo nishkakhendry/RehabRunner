@@ -53,7 +53,7 @@ public class Player : MonoBehaviour
         }
     }
 
-     void OnCollisionEnter(Collision collisionInfo)
+    void OnCollisionEnter(Collision collisionInfo)
     {
         if (collisionInfo.collider.name!="Platform") {
             Debug.Log("Game Over");

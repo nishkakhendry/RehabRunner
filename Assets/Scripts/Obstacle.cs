@@ -32,7 +32,7 @@ public class Obstacle : MonoBehaviour
         float height = 1;
         Vector3 scale;
         float size = (xPosition < 0) ? (Random.Range(2.0f, 2 * (xPosition + 6))) : (Random.Range(2.0f, 2 * (6 - xPosition)));
-        if (size < 9)
+        if (size < 8)
         {
             float rng = Random.Range(0f, 1f);
             if (rng < 0.3)
