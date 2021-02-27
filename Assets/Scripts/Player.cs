@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
         // Right Event
         if (Input.GetKeyDown(KeyCode.RightArrow))
         { 
-            if ((transform.position.x + 2.5f < 5.0f)&&(!moving) && (Mathf.Abs(transform.position.y + 1))<eps) {
+            if ((transform.position.x + 2.5f < 5.0f)&& (Mathf.Abs(transform.position.y + 1))<eps) {
                 moving = true;
                 end = transform.position + new Vector3(2.5f,0,0);
             }
@@ -30,7 +30,7 @@ public class Player : MonoBehaviour
         // Left Event
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         { 
-            if ((transform.position.x - 2.5f > -5.0f)&&(!moving)&& (Mathf.Abs(transform.position.y + 1))<eps) {
+            if ((transform.position.x - 2.5f > -5.0f)&& (Mathf.Abs(transform.position.y + 1))<eps) {
                 moving = true;
                 end = transform.position + new Vector3(-2.5f,0,0);
             }
@@ -38,7 +38,7 @@ public class Player : MonoBehaviour
         }
 
         // Up Event
-        if (Input.GetKeyDown(KeyCode.UpArrow)) {
+        if (Input.GetKeyDown(KeyCode.Space)) {
             rb.AddForce(0,500,0);
         }
         if (moving) {
@@ -49,6 +49,13 @@ public class Player : MonoBehaviour
         if (Mathf.Abs(transform.position.x-end.x)<eps) {
             moving = false;
             
+        }
+    }
+
+     void OnCollisionEnter(Collision collisionInfo)
+    {
+        if (collisionInfo.collider.name!="Platform") {
+            Debug.Log("Game Over");
         }
     }
 }
