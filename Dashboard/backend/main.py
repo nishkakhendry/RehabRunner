@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 import pymongo
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -11,6 +12,7 @@ client = MongoClient(
 col = client['maybekinnectgame']['userdata']
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/')
