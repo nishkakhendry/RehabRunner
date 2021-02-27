@@ -7,6 +7,7 @@ public class Obstacle : MonoBehaviour
     public GameObject obstacle;
     private float timePassed = 0;
     public float spawnFrequency = 3;
+    public static List<GameObject> obstacles = new List<GameObject>();
     // Start is called before the first frame update
     void Start()
     {
@@ -27,21 +28,21 @@ public class Obstacle : MonoBehaviour
 
     void spawnObstacle()
     {
-        float xPosition = Random.Range(-4.5f, 4.5f);
+        float xPosition = Random.Range(-3.5f, 3.5f);
         float yPosition = -1;
         float height = 1;
         Vector3 scale;
-        float size = (xPosition < 0) ? (Random.Range(2.0f, 2 * (xPosition + 6))) : (Random.Range(2.0f, 2 * (6 - xPosition)));
+        float size = (xPosition < 0) ? (Random.Range(3.5f, 2 * (xPosition + 6))) : (Random.Range(3.5f, 2 * (6 - xPosition)));
         if (size < 8)
         {
             float rng = Random.Range(0f, 1f);
             if (rng < 0.3)
             {
-                height = 3;
+                height = 4;
             }
             else if (rng < 0.6)
             {
-                height = 1.3f;
+                height = 1.8f;
             }
             else
             {
@@ -57,5 +58,6 @@ public class Obstacle : MonoBehaviour
         scale = new Vector3(size, height, 1);
         GameObject currObstacle = Instantiate(obstacle, new Vector3(xPosition, yPosition, 0), Quaternion.identity);
         currObstacle.transform.localScale = scale;
+        obstacles.Add(currObstacle);
     }
 }

@@ -15,6 +15,12 @@ public class Player : MonoBehaviour
     private float jumpSkip = 0.1f;
     private float eps = 0.01f;
     private Animator animator;
+    private enum PossibleMoves {
+        Left,
+        Right,
+        Jump, 
+        Idle
+    }
     // Start is called before the first frame update
     void Start()
     {   
@@ -24,9 +30,12 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        generatePossibleMoves();
+        
         if (jumping && (timeSinceJump<jumpSkip)) {
             timeSinceJump += Time.deltaTime;
         } else {
+
             timeSinceJump = 0f;
             if ((Mathf.Abs(transform.position.y + 1.5f) < eps)&&jumping){
                 animator.runtimeAnimatorController = Resources.Load("BasicMotions@Run") as RuntimeAnimatorController;
@@ -34,21 +43,31 @@ public class Player : MonoBehaviour
             }
             
             // Right Event
+            // Debug.Log(gonnaColide());
             if (Input.GetKeyDown(KeyCode.RightArrow))
             { 
-                if ((transform.position.x + 2.5f < 5.0f)&& (Mathf.Abs(transform.position.y + 1.5f))<eps) {
+                if (gonnaColide()) {
                     moving = true;
-                    end = transform.position + new Vector3(2.5f,0,0);
+                    end = new Vector3(bestRight(),transform.position.y,transform.position.z);
                 }
+                // if ((transform.position.x + 2.5f < 5.0f)&& (Mathf.Abs(transform.position.y + 1.5f))<eps) {
+                //     moving = true;
+                //     end = transform.position + new Vector3(2.5f,0,0);
+                // }
                 
             }
             // Left Event
             if (Input.GetKeyDown(KeyCode.LeftArrow))
-            { 
-                if ((transform.position.x - 2.5f > -5.0f)&& (Mathf.Abs(transform.position.y + 1.5f))<eps) {
+            {
+                if (gonnaColide()) {
                     moving = true;
-                    end = transform.position + new Vector3(-2.5f,0,0);
+                    end = new Vector3(bestLeft(),transform.position.y,transform.position.z);
                 }
+
+                // if ((transform.position.x - 2.5f > -5.0f)&& (Mathf.Abs(transform.position.y + 1.5f))<eps) {
+                //     moving = true;
+                //     end = transform.position + new Vector3(-2.5f,0,0);
+                // }
                 
             }
 
@@ -62,7 +81,7 @@ public class Player : MonoBehaviour
 
             }
             if (moving) {
-                float timeDelta = 3*Mathf.Abs(end.x - transform.position.x);
+                float timeDelta = 5*Mathf.Abs(end.x - transform.position.x);
                 transform.position = Vector3.MoveTowards(transform.position, end, timeDelta*Time.deltaTime);
             }
 
@@ -85,5 +104,90 @@ public class Player : MonoBehaviour
             SceneManager.LoadScene("GameOver");
             
         }
+    }
+
+    float bestLeft() {
+        GameObject nextObstacle = Obstacle.obstacles[0];
+        float obstacleCenterX = nextObstacle.transform.position.x;
+        float xScale = nextObstacle.transform.localScale.x;
+        float leftX = obstacleCenterX - xScale/2;
+        float width = bc.size.x;
+        float perfectSpot = leftX - 0.2f - width/2;
+
+        if (perfectSpot>(-6+width/2)) {
+            return perfectSpot;
+        } else {
+            return -6+width/2;
+        }
+    }
+
+    float bestRight() {
+        GameObject nextObstacle = Obstacle.obstacles[0];
+        float obstacleCenterX = nextObstacle.transform.position.x;
+        float xScale = nextObstacle.transform.localScale.x;
+        float rightX = obstacleCenterX + xScale/2;
+        float width = bc.size.x;
+        float perfectSpot = rightX + 0.2f + width/2;
+
+        if (perfectSpot<(6-width/2)) {
+            return perfectSpot;
+        } else {
+            return 6-width/2;
+        }
+    }
+
+    bool gonnaColide() {
+        float currXPos = transform.position.x;
+        GameObject nextObstacle = Obstacle.obstacles[0];
+        float obstacleCenterX = nextObstacle.transform.position.x;
+        float xScale = nextObstacle.transform.localScale.x;
+        float leftX = obstacleCenterX - xScale/2;
+        float rightX = obstacleCenterX + xScale/2;
+
+        if ((leftX - 0.3 <= currXPos)&&(rightX +0.3>=currXPos)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    List<PossibleMoves> generatePossibleMoves(){
+        List<PossibleMoves> possibleMoves = new List<PossibleMoves>();
+
+        float currXPos = transform.position.x;
+        GameObject nextObstacle = Obstacle.obstacles[0];
+        float obstacleCenterX = nextObstacle.transform.position.x;
+        float xScale = nextObstacle.transform.localScale.x;
+        float yScale = nextObstacle.transform.localScale.y;
+        float leftX = obstacleCenterX - xScale/2;
+        float rightX = obstacleCenterX + xScale/2;
+        float width = bc.size.x;
+        
+
+        if (gonnaColide()){
+            if (yScale <= 2){
+                possibleMoves.Add(PossibleMoves.Jump);
+            }
+            float perfectSpot = leftX - 0.2f - width/2;
+
+            if (perfectSpot>(-6+width/2)) {
+                possibleMoves.Add(PossibleMoves.Left);
+            }
+
+            perfectSpot = rightX + 0.2f + width/2;
+
+            if (perfectSpot<(6-width/2)) {
+                possibleMoves.Add(PossibleMoves.Right);
+            }
+        } else {
+            possibleMoves.Add(PossibleMoves.Idle);
+        }
+        string possible = "[";
+        foreach( var x in possibleMoves) {
+            possible = possible + x.ToString() + ", ";
+        }
+        Debug.Log(possible+"]");
+        return possibleMoves;
+
     }
 }
