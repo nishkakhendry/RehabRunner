@@ -6,7 +6,7 @@ public class Obstacle : MonoBehaviour
 {
     public GameObject obstacle;
     private float timePassed = 0;
-    private float spawnFrequency = 3;
+    public float spawnFrequency = 3;
     // Start is called before the first frame update
     void Start()
     {
@@ -41,7 +41,7 @@ public class Obstacle : MonoBehaviour
             }
             else if (rng < 0.6)
             {
-                height = 2;
+                height = 1.5f;
             }
             else
             {
