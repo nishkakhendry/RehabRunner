@@ -7,11 +7,14 @@ from collections import deque
 import logging
 from flask import Flask
 from celery import Celery
+import socket
+from io import BytesIO
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
 logger.handlers = []
-fh = logging.FileHandler("points.log")
+# fh = logging.FileHandler("points.log")
+fh = logging.StreamHandler()
 fh.setLevel(logging.INFO)
 logger.addHandler(fh)
 
@@ -23,7 +26,7 @@ BODY_PARTS = {"Nose": 0, "Neck": 1, "RShoulder": 2, "RElbow": 3, "RWrist": 4,
 
 BODY_PARTS_INVERSE = ["" for i in range(len(BODY_PARTS))]
 for key in BODY_PARTS:
-    index = BODY_PARTS[key]  
+    index = BODY_PARTS[key]
     BODY_PARTS_INVERSE[index] = key
 
 POSE_PAIRS = [["Neck", "RShoulder"], ["Neck", "LShoulder"], ["RShoulder", "RElbow"],
@@ -35,7 +38,7 @@ POSE_PAIRS = [["Neck", "RShoulder"], ["Neck", "LShoulder"], ["RShoulder", "RElbo
     "Neck", "Nose"], ["Nose", "REye"],
     ["REye", "REar"], ["Nose", "LEye"], ["LEye", "LEar"]]
 net = cv.dnn.readNetFromCaffe("pose/coco/deploy_coco.prototxt",
-                                        "pose/coco/pose_iter_440000.caffemodel")
+                              "pose/coco/pose_iter_440000.caffemodel")
 
 
 def pose_estimation(frame, inWidth=380, inHeight=380):
@@ -73,20 +76,33 @@ def draw_skeleton(frame, points):
     return frame
 
 
-def display_video(display=True):
+def main(display=True):
     # cap = cv.VideoCapture(0)
-    cap = cv.VideoCapture("/Users/abhinav/Desktop/intuition/hips.mp4")
+    cap = cv.VideoCapture(
+        "/Users/abhinav/Desktop/MaybeKinectGame/Pose_Estimation/exercise_videos/hips.mp4")
     ED = ExerciseDetection()
+    host = ""
+    port = 6969
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((host, port))
+    print("socket binded to port", port)
+    s.listen(5)
+    print("socket is listening")
+
     while(True):
+        c, addr = s.accept()
+
         ret, frame = cap.read()
-        height,width = frame.shape[0],frame.shape[1]
-        points = pose_estimation(frame,150,150)
+        height, width = frame.shape[0], frame.shape[1]
+        points = pose_estimation(frame, 150, 150)
         dictified_points = convert_points_dict(points)
         ED.add_point_hip_collection(dictified_points)
-        # print(ED.point_hip_collection_history)
-        hip_movement = ED.detect_hip_movement(height,width)
+
+        hip_movement = ED.detect_hip_movement(height, width)
         logger.info(hip_movement)
-        # logger.info(len(ED.point_hip_collection_history))
+        hip_movement = hip_movement.encode()
+        c.send(hip_movement)
+
         if(len(points)):
             pose = draw_skeleton(frame, points)
         else:
@@ -99,108 +115,104 @@ def display_video(display=True):
 
 def convert_points_dict(points):
     return {
-        BODY_PARTS_INVERSE[i]:points[i] for i in range(len(points))
+        BODY_PARTS_INVERSE[i]: points[i] for i in range(len(points))
     }
 
 
 class ExerciseDetection:
-    def __init__(self, history_len =25):
-        self.point_collection_history =[]
+    def __init__(self, history_len=25):
+        self.point_collection_history = []
         self.history_len = history_len
         self.point_hip_collection_history = []
 
     def add_point_collection(self, point_collection):
-        if(len(self.point_collection_history)==self.history_len):
+        if(len(self.point_collection_history) == self.history_len):
             self.point_collection_history.pop(0)
         self.point_collection_history.append(point_collection)
 
     def add_point_hip_collection(self, point_hip_collection):
-        if(len(self.point_hip_collection_history)==self.history_len):
+        if(len(self.point_hip_collection_history) == self.history_len):
             self.point_hip_collection_history.pop(0)
         self.point_hip_collection_history.append(point_hip_collection)
 
-
     def validate(self, configurator):
-        if len(self.point_collection_history)!=self.history_len:
+        if len(self.point_collection_history) != self.history_len:
             return False
 
         first = self.point_collection_history[0]
         last = self.point_collection_history[-1]
         result = True
         for body_joint in configurator:
-            fb_pos_x,fb_pos_y = first[body_joint]
-            lb_pos_x,lb_pos_y= last[body_joint]
+            fb_pos_x, fb_pos_y = first[body_joint]
+            lb_pos_x, lb_pos_y = last[body_joint]
             # final greater than starting x
-            if body_joint[0]==1:
-                result = result and (lb_pos_x - fb_pos_x)>=0
+            if body_joint[0] == 1:
+                result = result and (lb_pos_x - fb_pos_x) >= 0
             # final not greater than starting x
             else:
-                result = result and (lb_pos_x - fb_pos_x)<=0
+                result = result and (lb_pos_x - fb_pos_x) <= 0
             # final greater than starting y
-            if body_joint[1] ==1:
-                result = result and (lb_pos_y - fb_pos_y)>=0
+            if body_joint[1] == 1:
+                result = result and (lb_pos_y - fb_pos_y) >= 0
             # final not greater than starting y
             else:
-                result = result and (lb_pos_y - fb_pos_y)<=0
+                result = result and (lb_pos_y - fb_pos_y) <= 0
         return result
-
 
     def detect_basket_ball_shoot(self):
         config = {
-            "LElbow":(1,-1),"RElbow":(1,-1),"LWrist":(1,-1),"RWrist":(1,-1)
+            "LElbow": (1, -1), "RElbow": (1, -1), "LWrist": (1, -1), "RWrist": (1, -1)
         }
         result = self.validate(config)
         return result
 
     def detect_lounge_right(self):
         config = {
-            "RKnee":(-1,1),"LKnee":(1,1),"RAnkle":(-1,-1),"LAnkle":(1,-1)
+            "RKnee": (-1, 1), "LKnee": (1, 1), "RAnkle": (-1, -1), "LAnkle": (1, -1)
         }
         result = self.validate(config)
         return result
 
     def detect_lounge_left(self):
         config = {
-            "RKnee":(1,1),"LKnee":(-1,1),"RAnkle":(1,-1),"LAnkle":(-1,-1)
+            "RKnee": (1, 1), "LKnee": (-1, 1), "RAnkle": (1, -1), "LAnkle": (-1, -1)
         }
         result = self.validate(config)
         return result
 
-
     def detect_tennis_serve(self):
         config = {
-            "LElbow":(1,-1),"RElbow":(1,-1),"LWrist":(1,-1),"RWrist":(1,-1)
+            "LElbow": (1, -1), "RElbow": (1, -1), "LWrist": (1, -1), "RWrist": (1, -1)
         }
         result = self.validate(config)
         return result
 
     def detect_leg_lift(self):
         config = {
-            "RKnee":(1,1),"RAnkle":(1,1),"LAnkle":(-1,1),"RKnee":(-1,1)
+            "RKnee": (1, 1), "RAnkle": (1, 1), "LAnkle": (-1, 1), "RKnee": (-1, 1)
         }
 
-    def detect_hip_movement(self,height,width):
+    def detect_hip_movement(self, height, width):
         try:
-            x_dif = self.point_hip_collection_history[-1]["LHip"][0]-self.point_hip_collection_history[-6]["LHip"][0]
-            y_dif = self.point_hip_collection_history[-1]["LHip"][1]-self.point_hip_collection_history[-6]["LHip"][1]
+            x_dif = self.point_hip_collection_history[-1]["LHip"][0] - \
+                self.point_hip_collection_history[-6]["LHip"][0]
+            y_dif = self.point_hip_collection_history[-1]["LHip"][1] - \
+                self.point_hip_collection_history[-6]["LHip"][1]
             result = "none"
-            dif_threshold =0.0001
-            if abs(x_dif)>abs(y_dif):
-                if x_dif>dif_threshold*width:
+            dif_threshold = 0.0001
+            if abs(x_dif) > abs(y_dif):
+                if x_dif > dif_threshold*width:
                     result = "right"
-                elif x_dif<-dif_threshold*width:
+                elif x_dif < -dif_threshold*width:
                     result = "left"
             else:
-                if y_dif>dif_threshold*height:
+                if y_dif > dif_threshold*height:
                     result = "down"
-                elif y_dif<-dif_threshold*height:
+                elif y_dif < -dif_threshold*height:
                     result = "up"
             return result
         except:
             return "none"
-
-
-display_video()
 
 
 # img = cv.imread("./test_images/sample.jpg")
@@ -210,8 +222,8 @@ display_video()
 # cv.imshow("result",draw_skeleton(img,results))
 
 
-cv.waitKey(0)
-cv.destroyAllWindows()
+# cv.waitKey(0)
+# cv.destroyAllWindows()
 
 # app = Flask(__name__)
 
@@ -222,8 +234,5 @@ cv.destroyAllWindows()
 
 # @app.route('/poseestimation',methods=[''])
 # def api_poseestimation():
-    
-
-
-# if __name__ == "__main__":
-#     app.run(port=3000)
+if __name__ == "__main__":
+    main(display=False)
