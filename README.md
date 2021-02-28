@@ -14,7 +14,7 @@ RehabRunner is a hack designed to help people who are suffering from physical in
 3. Exercise detection
 4. Dashboard
 
-## Game
+## 1. Game
 
 ### Use
 
@@ -26,7 +26,7 @@ The Game has been made in order to provide a fun and interactive method to enabl
 2. The game communicates with a python backend to do most of the image processing, this connection is made using a TCP connection. Real time results are computed and sent back with minimal lag.
 3. The player is then able to control his in game character to play the game.
 
-## Pose Estimation
+## 2. Pose Estimation
 
 ### Use
 
@@ -38,7 +38,7 @@ We use pose estimation in order to detect the movement of key joints of a person
 2. The model receives the information data from the game frontend using a TCP socket connection
 3. The model then runs the predictions of each frame in a queue sending in the results, the threading enables us to get results with a delay of around 1.2 ms
 
-## Exercise Detection
+## 3. Exercise Detection
 
 ### Use
 
@@ -49,7 +49,7 @@ We use this part to detect whether the person is performing a correct action giv
 1. Finding datasets for this very niche problem was very hard, we found a lot of videos from the internet of some basic exercises and recorded some videos as well.
 2. We use a delta based approximation algorithm to find whether a person correctly completes an exercise, we measure how well he does it using a threshold.
 
-## Dashboard
+## 4. Dashboard
 
 ### Use
 
