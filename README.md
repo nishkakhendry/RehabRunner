@@ -1,11 +1,11 @@
-# ERehab
+# RehabRunner
 
-ERehab is a hack designed to target people suffering from physical injuries and require rehabillitation in current times.
+RehabRunner is a hack designed to help people who are suffering from physical injuries and require rehabillitation in current times.
 
-1. ERehab enables people to save a lot of money required in physical rehabillitation by providing computer vision technologies to tackle this problem
-2. It saves time by reducing the time people take to travel to the hospital
-3. Studies show that during COVID times most of the spaces inside major hospital's orthopaedic units have been repurposed to house people suffering from COVID symptoms, ERehab helps with social distancing and takes care of the problem of space constraints inside hospitals
-4. ERehab helps target children by providing a gamified way to rehabillitate children
+1. RehabRunner enables people to save a lot of money required in physical rehabillitation by providing computer vision technologies to tackle this problem.
+2. It saves time by reducing the time people take to travel to the hospital.
+3. Studies show that during COVID times most of the spaces inside major hospital's orthopaedic units have been repurposed to house people suffering from COVID symptoms. RehabRunner helps with social distancing and takes care of the problem of space constraints inside hospitals.
+4. RehabRunner helps target children by providing a gamified way to rehabillitate children.
 
 ## Components of Hack
 
