@@ -5,11 +5,12 @@ using UnityEngine;
 
 public class WebcamScript : MonoBehaviour
 {
+    public static WebCamTexture webcamTexture;
     // Start is called before the first frame update
 
     void Start()
     {
-        WebCamTexture webcamTexture = new WebCamTexture();
+        webcamTexture = new WebCamTexture();
         // webcamTexture.deviceName = devices[0].name;
         this.GetComponent<MeshRenderer>().material.mainTexture = webcamTexture;
         webcamTexture.Play();
@@ -20,4 +21,5 @@ public class WebcamScript : MonoBehaviour
     {
 
     }
+
 }

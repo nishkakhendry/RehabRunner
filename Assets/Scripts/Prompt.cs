@@ -51,15 +51,15 @@ public class Prompt : MonoBehaviour
         var currPrompt = possibleMoves[index];
         if (currPrompt == Player.PossibleMoves.Jump)
         {
-            videoPlayer.url = "/Users/naseer2426/Desktop/Projects/Competitions/Intuition/JustDance/Assets/Videos/Jump/Jump2.mp4";
+            videoPlayer.url = "Assets/Videos/Jump/Jump2.mp4";
         }
         else if (currPrompt == Player.PossibleMoves.Right)
         {
-            videoPlayer.url = "/Users/naseer2426/Desktop/Projects/Competitions/Intuition/JustDance/Assets/Videos/Right/Right1.mp4";
+            videoPlayer.url = "Assets/Videos/Right/Right1.mp4";
         }
         else
         {
-            videoPlayer.url = "/Users/naseer2426/Desktop/Projects/Competitions/Intuition/JustDance/Assets/Videos/Left/Left1.mp4";
+            videoPlayer.url = "Assets/Videos/Left/Left1.mp4";
         }
     }
 }

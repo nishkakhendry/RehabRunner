@@ -103,6 +103,7 @@ public class Player : MonoBehaviour
     {
         if (collisionInfo.collider.name!="Platform") {
             Debug.Log("Game Over");
+            WebcamScript.webcamTexture.Stop();
             SceneManager.LoadScene("GameOver");
             
         }
