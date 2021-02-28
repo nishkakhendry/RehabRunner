@@ -17,5 +17,11 @@ public class GameOverScene : MonoBehaviour
 
     }
 
+    public void progButton(){
+
+        //link to url
+        Application.OpenURL("http://unity3d.com/");
+    }
+
 
 }
