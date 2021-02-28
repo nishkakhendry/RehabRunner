@@ -15,6 +15,7 @@ public class Player : MonoBehaviour
     private float jumpSkip = 0.1f;
     private float eps = 0.01f;
     private Animator animator;
+    private bool bot = false;
     public enum PossibleMoves {
         Left,
         Right,
@@ -22,6 +23,7 @@ public class Player : MonoBehaviour
         Idle
     }
     public static List<PossibleMoves> possibleMoves;
+    public static PossibleMoves RandomPossibleMove;
     // Start is called before the first frame update
     void Start()
     {   
@@ -33,7 +35,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         possibleMoves = generatePossibleMoves();
-        
+        RandomPossibleMove = Prompt.currPrompt;
         if (jumping && (timeSinceJump<jumpSkip)) {
             timeSinceJump += Time.deltaTime;
         } else {
@@ -45,41 +47,38 @@ public class Player : MonoBehaviour
             }
             
             // Right Event
-            // Debug.Log(gonnaColide());
-            if (Input.GetKeyDown(KeyCode.RightArrow))
+            if ((Input.GetKeyDown(KeyCode.RightArrow))||((RandomPossibleMove == PossibleMoves.Right)&&bot))
             { 
-                // if (gonnaColide()) {
-                    moving = true;
-                    end = new Vector3(bestRight(),transform.position.y,transform.position.z);
-                // }
-                // if ((transform.position.x + 2.5f < 5.0f)&& (Mathf.Abs(transform.position.y + 1.5f))<eps) {
-                //     moving = true;
-                //     end = transform.position + new Vector3(2.5f,0,0);
-                // }
+        
+                moving = true;
+                end = new Vector3(bestRight(),transform.position.y,transform.position.z);
+                
                 
             }
             // Left Event
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            if (Input.GetKeyDown(KeyCode.LeftArrow)||((RandomPossibleMove == PossibleMoves.Left)&&bot))
             {
-                // if (gonnaColide()) {
                     moving = true;
                     end = new Vector3(bestLeft(),transform.position.y,transform.position.z);
-                // }
-
-                // if ((transform.position.x - 2.5f > -5.0f)&& (Mathf.Abs(transform.position.y + 1.5f))<eps) {
-                //     moving = true;
-                //     end = transform.position + new Vector3(-2.5f,0,0);
-                // }
                 
             }
 
+            if (Input.GetKeyDown(KeyCode.DownArrow)) {
+                bot = !bot;
+            }
+
             // Up Event
-            if (Input.GetKeyDown(KeyCode.Space)) {
+            if (Input.GetKeyDown(KeyCode.Space)||((RandomPossibleMove == PossibleMoves.Jump)&&bot)) {
                 
                 //set animator to jump
-                jumping = true;
-                animator.runtimeAnimatorController = Resources.Load("BasicMotions@Jump") as RuntimeAnimatorController;
-                rb.AddForce(0,500,0);
+                GameObject nextObstacle = Obstacle.obstacles[0];
+                float distance = nextObstacle.transform.position.z - transform.position.z;
+                if ((distance<7)&&!jumping) {
+                    jumping = true;
+                    animator.runtimeAnimatorController = Resources.Load("BasicMotions@Jump") as RuntimeAnimatorController;
+                    rb.AddForce(0,500,0);
+                }
+                
 
             }
             if (moving) {
@@ -92,10 +91,6 @@ public class Player : MonoBehaviour
                 
             }
         }
-
-        
-
-        //if position less than -1.5, set jumping to false and change animator back to running
         
     }
 

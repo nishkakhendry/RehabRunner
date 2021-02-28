@@ -8,6 +8,7 @@ public class Prompt : MonoBehaviour
     private VideoPlayer videoPlayer;
     private float timePassed = 0;
     private bool firstObstacleDestroyed = false;
+    public static Player.PossibleMoves currPrompt;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,7 +19,7 @@ public class Prompt : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if ((!firstObstacleDestroyed) && (timePassed < 0.5))
+        if ((!firstObstacleDestroyed) && (timePassed < 1))
         {
             timePassed += Time.deltaTime;
         }
@@ -48,7 +49,7 @@ public class Prompt : MonoBehaviour
     void showVideoPrompt(List<Player.PossibleMoves> possibleMoves)
     {
         int index = Random.Range(0, possibleMoves.Count - 1);
-        var currPrompt = possibleMoves[index];
+        currPrompt = possibleMoves[index];
         if (currPrompt == Player.PossibleMoves.Jump)
         {
             videoPlayer.url = "Assets/Videos/Jump/Jump2.mp4";
