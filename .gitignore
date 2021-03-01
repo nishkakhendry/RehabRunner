@@ -5,3 +5,4 @@ env
 *log
 *caffemodel
 result*
+.DS_Store
